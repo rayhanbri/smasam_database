@@ -8,18 +8,25 @@ const PORT = process.env.PORT || 3000;
 const client = new MongoClient(process.env.MONGODB_URI);
 
 async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
-  }
+    try {
+        await client.connect();
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+        const db = client.db("smasam_database"); // change to your DB name
+        const users = db.collection("users");   // change to your collection name
+
+        app.get("/add-user", async (req, res) => {
+            const newUser = { name: "Rayhan", email: "rayhan@test.com" };
+            await users.insertOne(newUser);
+            res.send("User added!");
+        });
+
+        app.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+        });
+    } catch (err) {
+        console.error(err);
+    }
 }
 run();
-
-
-
